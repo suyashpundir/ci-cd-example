@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo Installing dependencies...
+      - pip install boto3 pytest
+  pre_build:
+    commands:
+      - echo Running syntax check...
+      - python -m py_compile scanner.py
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Running unit tests...
+      - pytest test_scanner.py
+  post_build:
+    commands:
+      - echo Uploading code to S3...
+      - aws s3 sync . s3://buildspace-suyash --exclude "*" --include "scanner.py"
+
+artifacts:
+  files:
+    - scanner.py
